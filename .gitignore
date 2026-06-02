@@ -49,7 +49,9 @@ Thumbs.db
 desktop.ini
 
 interview_prep.md
-client
+
+client/src/**.**.js
+
 tmp/
 temp/
 *.tmp
@@ -57,7 +59,7 @@ temp/
 
 uploads/
 storage/
-client
+
 .nyc_output/
 
 

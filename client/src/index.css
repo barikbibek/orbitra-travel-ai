@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --color-background: var(--theme-bg);
+  --color-surface: var(--theme-surface);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-foreground: var(--theme-text);
+  --color-muted: var(--theme-text-muted);
+  --color-border-subtle: var(--theme-border);
+}
+
+@layer base {
+  :root {
+    --theme-bg: var(--color-slate-50);
+    --theme-surface: var(--color-white);
+    --theme-surface-hover: var(--color-slate-100);
+    --theme-text: var(--color-slate-900);
+    --theme-text-muted: var(--color-slate-500);
+    --theme-border: var(--color-slate-200);
+  }
+
+  .dark {
+    --theme-bg: var(--color-slate-950);
+    --theme-surface: var(--color-slate-900);
+    --theme-surface-hover: var(--color-slate-800);
+    --theme-text: var(--color-slate-100);
+    --theme-text-muted: var(--color-slate-400);
+    --theme-border: var(--color-slate-800);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    @apply antialiased selection:bg-blue-500/30 selection:text-blue-200 transition-colors duration-300;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-surface/50 backdrop-blur-md border border-border-subtle shadow-xl;
+  }
+  
+  .glass-card {
+    @apply bg-surface/40 backdrop-blur-sm border border-border-subtle shadow-lg hover:border-blue-500/50 transition-all duration-300;
+  }
+  
+  .text-glow {
+    text-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+/* Custom Scrollbar for a premium feel */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: var(--theme-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--theme-border);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--theme-text-muted);
+}
