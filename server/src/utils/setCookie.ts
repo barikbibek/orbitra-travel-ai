@@ -13,6 +13,7 @@ export const setAuthCookies = (
     secure:   isProd,           // HTTPS only in production
     sameSite: 'strict',         // CSRF protection
     maxAge:   15 * 60 * 1000,   // 15 minutes
+    path:     '/',              // Fix: ensure token is sent to all endpoints
   });
 
   res.cookie('refresh_token', refreshToken, {
@@ -25,6 +26,6 @@ export const setAuthCookies = (
 };
 
 export const clearAuthCookies = (res: Response): void => {
-  res.clearCookie('access_token');
+  res.clearCookie('access_token', { path: '/' });
   res.clearCookie('refresh_token', { path: '/api/auth/refresh' });
 };
