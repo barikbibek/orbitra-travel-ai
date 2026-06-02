@@ -1,82 +1,257 @@
-# OrbitravelAI ✈️🤖
+# TravelAI — AI-Powered Travel Itinerary Generator
 
-OrbitravelAI is a modern, AI-powered travel itinerary generator built on the **MERN** stack. It allows users to upload their travel booking documents (such as flight tickets and hotel reservations) and automatically extracts the data to generate a beautifully structured, day-by-day travel plan. 
+A full-stack MERN application that lets users upload travel booking documents (flights, hotels, train tickets) and automatically generates a structured AI-powered itinerary.
 
+**Live Demo:** https://10xlab.online  
+**API:** https://api.10xlab.online
 
-## 🌟 Features
+---
 
-- **JWT Authentication:** Secure user registration and login functionality with protected routes.
-- **Drag-and-Drop File Upload:** Intuitive UI for uploading PDFs and images (supports AWS S3 integration).
-- **AI-Powered Data Extraction:** Integrates with Google's Gemini API to intelligently parse booking documents and structure the data.
-- **Itinerary Management:** Saves generated trips to MongoDB, allowing users to view and manage their past travel plans on a dashboard.
-- **Public Sharing:** Generates secure, read-only public links for itineraries with 1-click sharing to WhatsApp and Twitter/X.
-- **Premium UI/UX:** A highly responsive, "glassmorphism" design built with Tailwind CSS, featuring full Light/Dark mode support and fluid micro-animations.
+## Features
 
-## 🛠️ Tech Stack
+- **JWT Authentication** — Secure login/register with httpOnly cookies (XSS-safe) and refresh token rotation
+- **Document Upload** — Upload PDFs and images (flight tickets, hotel bookings, travel docs)
+- **AI Extraction** — Gemini 1.5 Flash extracts structured travel data from uploaded documents
+- **Itinerary Generation** — Automatically generates a day-by-day travel plan from extracted booking data
+- **History** — View all previously generated itineraries
+- **Sharing** — Toggle public sharing per itinerary via unique share link
+- **Redis Caching** — API responses cached for optimised performance
+- **AWS S3** — File storage with local fallback for development
+- **Rate Limiting** — Three-tier rate limiting to prevent abuse
+- **Dockerised** — Multi-stage Docker build, deployed on EC2 with Nginx reverse proxy
 
-### Frontend
-- **React.js** (Vite)
-- **Tailwind CSS** (for responsive styling and Light/Dark semantic theming)
-- **React Router** (for navigation)
-- **Lucide React** (for iconography)
-- **Axios** (for API communication)
+---
+
+## Tech Stack
 
 ### Backend
-- **Node.js & Express.js**
-- **MongoDB & Mongoose** (Database and ODM)
-- **AWS SDK (S3)** (For secure file storage and presigned URLs)
-- **Google Generative AI (Gemini)** (For intelligent data extraction and itinerary generation)
-- **JWT & bcryptjs** (For secure authentication)
-- **Multer** (For handling multipart/form-data uploads)
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js + Express.js |
+| Language | TypeScript |
+| Database | MongoDB + Mongoose |
+| Cache | Redis (ioredis) |
+| Auth | JWT (httpOnly cookies) + bcryptjs |
+| AI | Google Gemini 1.5 Flash |
+| File Storage | AWS S3 / Multer (local fallback) |
+| Validation | Zod |
+| Deployment | Docker + EC2 + Nginx |
 
-## 🚀 Getting Started
+### Frontend
+| Layer | Technology |
+|---|---|
+| Framework | React 18 + Vite |
+| Language | TypeScript |
+| Styling | Tailwind CSS |
+| Routing | React Router v6 |
+| HTTP | Axios (with interceptors) |
+| Icons | Lucide React |
+| Deployment | Netlify |
+
+---
+
+## Project Structure
+
+```
+orbitra-travel-ai/
+├── client/                        # React + Vite + Tailwind
+│   └── src/
+│       ├── api/                   # axios instance + API calls
+│       ├── components/            # Navbar, FileUploader, ItineraryCard
+│       ├── context/               # AuthContext
+│       ├── pages/                 # Login, Register, Dashboard, ItineraryDetail, SharedItinerary
+│       └── types/                 # TypeScript interfaces
+│
+├── server/                        # Node + Express + TypeScript
+│   ├── src/
+│   │   ├── config/                # db.ts, env.ts (Zod), redis.ts
+│   │   ├── controllers/           # auth, upload, itinerary
+│   │   ├── middlewares/           # auth, error, rateLimiter, upload
+│   │   ├── models/                # User, Document, Itinerary
+│   │   ├── routes/                # auth, upload, itinerary
+│   │   ├── services/              # ai.service, s3.service, itinerary.service
+│   │   ├── utils/                 # AppError, asyncHandler, setCookie, cache
+│   │   └── app.ts
+│   └── server.ts
+│
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+## API Reference
+
+```
+POST   /api/auth/register              Register + set auth cookies
+POST   /api/auth/login                 Login + set auth cookies
+POST   /api/auth/refresh               Rotate tokens
+POST   /api/auth/logout                Clear cookies
+GET    /api/auth/me                    Get current user
+
+POST   /api/upload                     Upload docs → extract → generate itinerary
+
+GET    /api/itineraries                Get history (paginated)
+GET    /api/itineraries/:id            Get single itinerary
+PATCH  /api/itineraries/:id/share      Toggle public sharing
+GET    /api/itineraries/shared/:token  Public share (no auth)
+DELETE /api/itineraries/:id            Delete itinerary
+```
+
+---
+
+## Local Development
 
 ### Prerequisites
-- Node.js (v18+ recommended)
-- MongoDB (Local or Atlas)
-- AWS Account (for S3 bucket)
-- Google Gemini API Key
+- Node.js 20+
+- MongoDB
+- Redis
+- Docker (optional)
 
-### Installation
+### 1. Clone the repo
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/barikbibek/orbitra-travel-ai.git
-   cd orbitra-travel-ai
-   ```
+```bash
+git clone https://github.com/barikbibek/orbitra-travel-ai.git
+cd orbitra-travel-ai
+```
 
-2. **Setup the Backend:**
-   ```bash
-   cd server
-   npm install
-   
-   Run the backend:
-   ```bash
-   npm run dev
-   ```
+### 2. Backend setup
 
-3. **Setup the Frontend:**
-   ```bash
-   cd ../client
-   npm install
-   ```
-   Create a `.env` file in the `client` directory:
-   ```env
-   VITE_API_URL=http://localhost:5000/api
-   ```
-   Run the frontend:
-   ```bash
-   npm run dev
-   ```
+```bash
+cd server
+cp .env.example .env
+# Fill in your values in .env
+npm install
+npm run dev
+```
 
-4. Open your browser and navigate to `http://localhost:5173`.
+### 3. Frontend setup
 
-## 💡 Architecture & Data Flow
-1. User uploads a PDF or image of their booking via the React frontend.
-2. The Node/Express backend receives the file via Multer and uploads it securely to AWS S3.
-3. The backend sends the file text (parsed via `pdf-parse`) or S3 URL to the Gemini AI API with a carefully crafted prompt.
-4. The AI returns a structured JSON itinerary, which is saved to MongoDB.
-5. The frontend fetches this data and renders it in a beautiful, shareable glassmorphism UI.
+```bash
+cd client
+npm install
+npm run dev
+```
+
+### 4. Or run everything with Docker
+
+```bash
+# From root
+docker-compose up --build
+```
+
+Frontend: http://localhost:5173  
+Backend: http://localhost:5000
+
+---
+
+## Environment Variables
+
+```bash
+# server/.env
+PORT=5000
+NODE_ENV=development
+
+MONGODB_URI=mongodb://localhost:27017/travel-ai
+REDIS_URL=redis://localhost:6379
+
+JWT_SECRET=your_jwt_secret_minimum_32_characters
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_SECRET=your_refresh_secret_minimum_32_characters
+REFRESH_TOKEN_EXPIRES_IN=7d
+
+GEMINI_API_KEY=your_gemini_api_key
+
+# Optional — falls back to local storage if not set
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=ap-south-1
+AWS_BUCKET_NAME=
+
+CLIENT_URL=http://localhost:5173
+```
+
+---
+
+## Deployment
+
+### Backend — EC2 + Docker + Nginx
+
+```bash
+# On EC2 instance
+git clone https://github.com/barikbibek/orbitra-travel-ai.git
+cd orbitra-travel-ai/server
+cp .env.example .env && nano .env
+
+docker-compose up -d --build
+```
+
+Nginx reverse proxy (`/etc/nginx/sites-available/travel-ai`):
+
+```nginx
+server {
+    listen 80;
+    server_name api.10xlab.online;
+
+    location / {
+        proxy_pass         http://localhost:5000;
+        proxy_http_version 1.1;
+        proxy_set_header   Upgrade $http_upgrade;
+        proxy_set_header   Connection 'upgrade';
+        proxy_set_header   Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+### Frontend — Netlify
+
+Connect repo to Netlify, set build command to `npm run build` and publish directory to `dist`.
+
+Add environment variable in Netlify dashboard:
+```
+VITE_API_URL=https://api.10xlab.online
+```
+
+---
+
+## Security Highlights
+
+- JWT stored in **httpOnly cookies** — immune to XSS attacks
+- **Refresh token rotation** — new token pair on every refresh
+- **Three-tier rate limiting** — auth (10 req/15min), upload (20 req/hr), general (100 req/15min)
+- **Helmet.js** — secure HTTP headers
+- **Zod validation** — all env vars and request bodies validated at runtime
+- **bcrypt (cost=12)** — password hashing
+- Identical error message for wrong email/password — prevents user enumeration
+
+---
+
+## Architecture Highlights
+
+- **Service layer pattern** — controllers are thin, all logic in services
+- **Redis caching** — itinerary history (2min TTL), detail (10min), shared (15min)
+- **Cache invalidation** — on create/update/delete, relevant cache keys cleared
+- **Parallel document processing** — `Promise.all` for multi-file upload + extraction
+- **Graceful S3 fallback** — app works without AWS credentials (local storage)
+- **Multi-stage Docker build** — production image has no devDependencies or TypeScript
+
+---
+
+## Screenshots
+
+
+### Login Page
+
+![Login Page](./screenshots/login.png)
+
+### Dashboard
+
+![Dashboard](./screenshots/dashboard.png)
+
+### Sharable Link Page
+
+![Sharable Link Page](./screenshots/sharelinkpage.png)
 
 ---
 
