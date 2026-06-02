@@ -1,0 +1,45 @@
+version: '3.9'
+
+services:
+  server:
+    build:
+      context: ./server
+      target: builder       
+    container_name: travel-ai-server
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - ./.env
+    volumes:
+      - ./server:/app        # hot reload in dev
+      - /app/node_modules    
+    command: npm run dev
+    depends_on:
+      - mongo
+      - redis
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:7
+    container_name: travel-ai-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: travel-ai-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes  # persist data
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  redis_data:
