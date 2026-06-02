@@ -1,4 +1,4 @@
-# TravelAI — AI-Powered Travel Itinerary Generator
+# OrbitravelAI — AI-Powered Travel Itinerary Generator
 
 A full-stack MERN application that lets users upload travel booking documents (flights, hotels, train tickets) and automatically generates a structured AI-powered itinerary.
 
